@@ -144,7 +144,26 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     "Search the node of least total cost first."
-
+    fringe = util.PriorityQueue()
+    initial_state = problem.getStartState()
+    initial_actions = []
+    initial_cost = 0
+    initial_candidate = (initial_state, initial_actions, initial_cost)
+    fringe.push(initial_candidate, initial_cost)
+    closed_set = set()
+    while not fringe.isEmpty():
+        candidate = fringe.pop()
+        state, actions, cost = candidate
+        if problem.isGoalState(state):
+            return actions
+        if state not in closed_set:
+            closed_set.add(state)
+            candidate_successors = problem.getSuccessors(state)
+            candidate_successors = filter(lambda x: x[0] not in closed_set, candidate_successors)
+            candidate_successors = map(lambda x: (x[0], actions + [x[1]], cost + x[2]), candidate_successors)
+            for candidate in candidate_successors:
+                fringe.push(candidate, candidate[2])
+                
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -154,7 +173,25 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
-
+    fringe = util.PriorityQueue()
+    initial_state = problem.getStartState()
+    initial_actions = []
+    initial_cost = 0
+    initial_candidate = (initial_state, initial_actions, initial_cost)
+    fringe.push(initial_candidate, initial_cost)
+    closed_set = set()
+    while not fringe.isEmpty():
+        candidate = fringe.pop()
+        state, actions, cost = candidate
+        if problem.isGoalState(state):
+            return actions
+        if state not in closed_set:
+            closed_set.add(state)
+            candidate_successors = problem.getSuccessors(state)
+            candidate_successors = filter(lambda x: x[0] not in closed_set, candidate_successors)
+            candidate_successors = map(lambda x: (x[0], actions + [x[1]], cost + x[2]), candidate_successors)
+            for candidate in candidate_successors:
+                fringe.push(candidate, candidate[2] + heuristic(candidate[0], problem))
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch

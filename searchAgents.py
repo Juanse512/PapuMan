@@ -267,26 +267,25 @@ class CornersProblem(search.SearchProblem):
         """
         Stores the walls, pacman's starting position and corners.
         """
-        self.walls = startingGameState.getWalls()
+        self.startingGameState = startingGameState
         self.startingPosition = startingGameState.getPacmanPosition()
+        self.walls = startingGameState.getWalls()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        self.cornersCheck = (True, True, True, True)
+        self.start = (self.startingPosition, self.cornersCheck)
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # Number of search nodes expanded
 
-        "*** YOUR CODE HERE ***"
-
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.start
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return state[1] == (False, False, False, False)
 
     def getSuccessors(self, state):
         """
@@ -299,19 +298,30 @@ class CornersProblem(search.SearchProblem):
          required to get there, and 'stepCost' is the incremental
          cost of expanding to that successor
         """
+        (position, corners) = state
 
+        corner1 = corners[0] if position != self.corners[0] else False
+        corner2 = corners[1] if position != self.corners[1] else False
+        corner3 = corners[2] if position != self.corners[2] else False
+        corner4 = corners[3] if position != self.corners[3] else False
+
+        nextCorners = (corner1, corner2, corner3, corner4)
+        
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+            x,y = position
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                successors.append( ( ((nextx, nexty), nextCorners), action, 1) )
 
-            "*** YOUR CODE HERE ***"
-
+        # Bookkeeping for display purposes
         self._expanded += 1
+        # capaz hay que comentar eso
+        # if state not in self._visited:
+        #     self._visited[state] = True
+        #     self._visitedlist.append(state)
+        
         return successors
 
     def getCostOfActions(self, actions):
@@ -344,8 +354,29 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Calculate the heuristic value for the current state
+    heuristic_value = 0
+    current_position, visited = state
+    corners_not_visited = [corners[i] for i in range(4) if visited[i]]
+    food_list = corners_not_visited
+    heuristic = 0
+    prev_pos = state[0]
+    while food_list:
+        closest_corner = food_list[0]
+        closest_corner_distance = util.manhattanDistance(prev_pos, closest_corner)
+
+        for corner in food_list[1:]:
+            distance = util.manhattanDistance(prev_pos, corner)
+
+            if distance < closest_corner_distance:
+                closest_corner_distance = distance
+                closest_corner = corner
+        
+        heuristic += closest_corner_distance
+        food_list.remove(closest_corner)
+        prev_pos = closest_corner
+
+    return heuristic
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
