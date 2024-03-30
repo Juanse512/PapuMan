@@ -355,7 +355,6 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     # Calculate the heuristic value for the current state
-    heuristic_value = 0
     current_position, visited = state
     corners_not_visited = [corners[i] for i in range(4) if visited[i]]
     food_list = corners_not_visited
@@ -364,7 +363,6 @@ def cornersHeuristic(state, problem):
     while food_list:
         closest_corner = food_list[0]
         closest_corner_distance = util.manhattanDistance(prev_pos, closest_corner)
-
         for corner in food_list[1:]:
             distance = util.manhattanDistance(prev_pos, corner)
 
@@ -468,8 +466,27 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    food_list = foodGrid.asList()
+    heuristic = 0
+    furthest_food = (None, 0)
+    snd_furthest_food = (None, 0)
+    if len(food_list) == 0:
+        return 0
+    if len(food_list) == 1:
+        return util.manhattanDistance(position, food_list[0])
+    # print(mazeDistance(food_list[0], food_list[1], problem.startingGameState))
+    for food in food_list:
+        distance = util.manhattanDistance(position, food)
+        if distance > furthest_food[1]:
+            snd_furthest_food = furthest_food
+            furthest_food = (food, distance)
+        elif distance > snd_furthest_food[1]:
+            snd_furthest_food = (food, distance)
+    x = util.manhattanDistance(furthest_food[0], snd_furthest_food[0])
+    y = util.manhattanDistance(position, snd_furthest_food[0])
+    heuristic = x + y
+
+    return heuristic
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -567,6 +584,8 @@ def mazeDistance(point1, point2, gameState):
     """
     x1, y1 = point1
     x2, y2 = point2
+    print(point1, point2)
+    print(gameState)
     walls = gameState.getWalls()
     assert not walls[x1][y1], 'point1 is a wall: ' + point1
     assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
