@@ -164,8 +164,6 @@ class Grid:
     def __setitem__(self, key, item):
         self.data[key] = item
 
-    def __lt__(self, other):
-        return True
 
     def __str__(self):
         out = [[str(self.data[x][y])[0] for x in range(self.width)] for y in range(self.height)]
@@ -205,8 +203,8 @@ class Grid:
 
     def asList(self, key = True):
         list = []
-        for x in range(self.width):
-            for y in range(self.height):
+        for y in range(self.height):
+            for x in range(self.width):
                 if self[x][y] == key: list.append( (x,y) )
         return list
 

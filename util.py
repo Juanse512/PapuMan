@@ -9,6 +9,15 @@
 import sys
 import inspect
 import heapq, random
+from dataclasses import dataclass, field
+from typing import Any
+
+
+
+@dataclass(order=True)
+class PrioritizedItem:
+    priority: int
+    item: Any = field(compare=False)
 
 
 """
@@ -67,12 +76,12 @@ class PriorityQueue:
         self.heap = []
 
     def push(self, item, priority):
-        pair = (priority,item)
+        pair = PrioritizedItem(priority,item)
         heapq.heappush(self.heap,pair)
 
     def pop(self):
-        (priority,item) = heapq.heappop(self.heap)
-        return item
+        pair = heapq.heappop(self.heap)
+        return pair.item
 
     def isEmpty(self):
         return len(self.heap) == 0
