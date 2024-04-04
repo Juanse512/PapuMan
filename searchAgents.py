@@ -465,40 +465,43 @@ def foodHeuristic(state, problem):
       problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
-
-    # position, foodGrid = state
-    # food_list = foodGrid.asList()
-    # heuristic = 0
-    # prev_pos = position
-    # while food_list:
-    #     closest_food = food_list[0]
-    #     closest_food_distance = util.manhattanDistance(prev_pos, closest_food)
-    #     for food in food_list[1:]:
-    #         distance = util.manhattanDistance(prev_pos, food)
-
-    #         if distance < closest_food_distance:
-    #             closest_food_distance = distance
-    #             closest_food = food
-    #     heuristic += closest_food_distance
-    #     food_list.remove(closest_food)
-    #     prev_pos = closest_food
+    # Encuentra un camino mas corto pero expande mas nodos  
 
     position, foodGrid = state
     food_list = foodGrid.asList()
     heuristic = 0
     prev_pos = position
     while food_list:
-        furthest_food = food_list[0]
-        furthest_food_distance = util.manhattanDistance(prev_pos, furthest_food)
+        closest_food = food_list[0]
+        closest_food_distance = util.manhattanDistance(prev_pos, closest_food)
         for food in food_list[1:]:
             distance = util.manhattanDistance(prev_pos, food)
 
-            if distance > furthest_food_distance:
-                furthest_food_distance = distance
-                furthest_food = food
-        heuristic += furthest_food_distance
-        food_list.remove(furthest_food)
-        prev_pos = furthest_food
+            if distance < closest_food_distance:
+                closest_food_distance = distance
+                closest_food = food
+        heuristic += closest_food_distance
+        food_list.remove(closest_food)
+        prev_pos = closest_food
+
+    # Encuentra un camino mas largo pero expande menos nodos
+
+    # position, foodGrid = state
+    # food_list = foodGrid.asList()
+    # heuristic = 0
+    # prev_pos = position
+    # while food_list:
+    #     furthest_food = food_list[0]
+    #     furthest_food_distance = util.manhattanDistance(prev_pos, furthest_food)
+    #     for food in food_list[1:]:
+    #         distance = util.manhattanDistance(prev_pos, food)
+
+    #         if distance > furthest_food_distance:
+    #             furthest_food_distance = distance
+    #             furthest_food = food
+    #     heuristic += furthest_food_distance
+    #     food_list.remove(furthest_food)
+    #     prev_pos = furthest_food
 
     return heuristic
 
