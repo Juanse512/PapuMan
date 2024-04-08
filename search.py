@@ -86,6 +86,12 @@ def search(problem, fringe):
             for candidate in candidate_successors:
                 fringe.push(candidate)
 
+"""
+El metodo de busqueda DFS usa el mismo esqueleto de busqueda general
+y manipula la frontera de nodos como si fuese una pila LIFO, de esta
+forma asegura que el orden de busqueda priorice la expansion de los 
+ultimos nodos expandidos (prioriza profundidad).
+""" 
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first
@@ -100,7 +106,7 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    fringe = util.Stack()
+    fringe = util.Stack() # Pila LIFO
     initial_state = problem.getStartState()
     initial_actions = []
     initial_candidate = (initial_state, initial_actions)
@@ -119,6 +125,12 @@ def depthFirstSearch(problem):
             for candidate in candidate_successors:
                 fringe.push(candidate)
 
+"""
+El metodo de busqueda BFS usa el mismo esqueleto de busqueda general
+y manipula la frontera de nodos como si fuese una cola FIFO, de esta
+forma asegura que el orden de busqueda priorice la expansion de los nodos de menor 
+profundidad.
+""" 
 def breadthFirstSearch(problem):
     """
     Search the shallowest nodes in the search tree first.
@@ -142,6 +154,11 @@ def breadthFirstSearch(problem):
             for candidate in candidate_successors:
                 fringe.push(candidate)
 
+"""
+El metodo de busqueda UCS usa el mismo esqueleto de busqueda general
+y manipula la frontera de nodos como si fuese una priority queue, de esta
+manera podemos mantener los nodos a expandir ordenados segun el costo de la accion.
+""" 
 def uniformCostSearch(problem):
     "Search the node of least total cost first."
     fringe = util.PriorityQueue()
@@ -171,6 +188,11 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+"""
+El metodo de busqueda A* usa el mismo esqueleto de busqueda general
+y manipula la frontera de nodos como si fuese una priority queue, de esta
+manera podemos mantener los nodos a expandir ordenados segun el costo de la accion.
+""" 
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     fringe = util.PriorityQueue()

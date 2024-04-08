@@ -272,6 +272,9 @@ class CornersProblem(search.SearchProblem):
         self.walls = startingGameState.getWalls()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        # Agregamos una tupla que indica las esquinas que queden por recorrer
+        # Cada posicion en la tupla self.cornersCheck representa la esquina de misma posicion en self.cornes
+        # True: Por recorrer, False: Recorrida
         self.cornersCheck = (True, True, True, True)
         self.start = (self.startingPosition, self.cornersCheck)
         for corner in self.corners:
@@ -285,6 +288,7 @@ class CornersProblem(search.SearchProblem):
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
+        # Si no quedan esquinas por recorrer, el juego ha terminado
         return state[1] == (False, False, False, False)
 
     def getSuccessors(self, state):
@@ -300,6 +304,8 @@ class CornersProblem(search.SearchProblem):
         """
         (position, corners) = state
 
+        # Si la posicion actual es alguna de las cuatro esquinas, marcamos
+        # la esquina correspondiente dentro de la tupla como Recorrida
         corner1 = corners[0] if position != self.corners[0] else False
         corner2 = corners[1] if position != self.corners[1] else False
         corner3 = corners[2] if position != self.corners[2] else False
@@ -317,10 +323,6 @@ class CornersProblem(search.SearchProblem):
 
         # Bookkeeping for display purposes
         self._expanded += 1
-        # capaz hay que comentar eso
-        # if state not in self._visited:
-        #     self._visited[state] = True
-        #     self._visitedlist.append(state)
         
         return successors
 
@@ -359,7 +361,12 @@ def cornersHeuristic(state, problem):
     corners_not_visited = [corners[i] for i in range(4) if visited[i]]
     food_list = corners_not_visited
     heuristic = 0
-    prev_pos = state[0]
+    prev_pos = current_position
+
+    # Calcula la distancia entre prev_pos y la comida mas cercana y la suma a heuristic
+    # Luego elimina la comida mas cercana de la lista de comidas y repite el proceso
+    # prev_pos inicia con la posicion del Pacman
+    
     while food_list:
         closest_corner = food_list[0]
         closest_corner_distance = util.manhattanDistance(prev_pos, closest_corner)
@@ -465,12 +472,17 @@ def foodHeuristic(state, problem):
       problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
-    # Encuentra un camino mas corto pero expande mas nodos  
-
     position, foodGrid = state
     food_list = foodGrid.asList()
     heuristic = 0
     prev_pos = position
+
+    #------------------------------------------------------------------------------------#
+    # Encuentra un camino mas corto pero expande mas nodos  
+    # Calcula la distancia entre prev_pos y la comida mas cercana y la suma a heuristic
+    # Luego elimina la comida mas cercana de la lista de comidas y repite el proceso
+    # prev_pos inicia con la posicion del Pacman
+
     while food_list:
         closest_food = food_list[0]
         closest_food_distance = util.manhattanDistance(prev_pos, closest_food)
@@ -484,12 +496,15 @@ def foodHeuristic(state, problem):
         food_list.remove(closest_food)
         prev_pos = closest_food
 
-    # Encuentra un camino mas largo pero expande menos nodos
+    #------------------------------------------------------------------------------------#
 
-    # position, foodGrid = state
-    # food_list = foodGrid.asList()
-    # heuristic = 0
-    # prev_pos = position
+    #------------------------------------------------------------------------------------#
+    # Encuentra un camino mas largo pero expande menos nodos
+    
+    # Calcula la distancia entre prev_pos y la comida mas lejana y la suma a heuristic
+    # Luego elimina la comida mas lejana de la lista de comidas y repite el proceso
+    # prev_pos inicia con la posicion del Pacman
+
     # while food_list:
     #     furthest_food = food_list[0]
     #     furthest_food_distance = util.manhattanDistance(prev_pos, furthest_food)
@@ -502,6 +517,8 @@ def foodHeuristic(state, problem):
     #     heuristic += furthest_food_distance
     #     food_list.remove(furthest_food)
     #     prev_pos = furthest_food
+
+    #------------------------------------------------------------------------------------#
 
     return heuristic
 
